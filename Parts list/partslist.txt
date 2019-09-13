@@ -13,6 +13,7 @@
   * ?
 * Silicone Wheel
   * https://www.amazon.com/CNBTR-Aluminum-Silicone-Industrial-Measuring/dp/B073P24YCP
+  * https://www.amazon.com/CNBTR-Aluminum-Industrial-Encoder-200mmx6mm/dp/B073P21D6W
 * Silicone Wheel bracket
   * ?
 * Teensy (3 needed)
