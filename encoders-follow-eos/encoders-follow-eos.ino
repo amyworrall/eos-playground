@@ -17,7 +17,17 @@ struct Encoder {
   float pos;
   uint8_t direction;
 };
-struct Encoder panWheel;
+struct Encoder enc1;
+struct Encoder enc2;
+struct Encoder enc3;
+struct Encoder enc4;
+struct Encoder intensity;
+
+long enc1val = 0;
+long enc2val = 0;
+long enc3val = 0;
+long enc4val = 0;
+
 
 static uint8_t transmit_previous_timeout=0;
 
@@ -88,7 +98,10 @@ int8_t updateEncoder(struct Encoder* encoder) {
 }
 
 void setup() {
-  initEncoder(&panWheel, 31, 32, 0);
+  initEncoder(&enc1, 3, 2, 0);
+  initEncoder(&enc2, 5, 4, 0);
+  initEncoder(&enc3, 7, 6, 0);
+  initEncoder(&enc4, 9, 8, 0);
 }
 
 void loop() {
@@ -96,19 +109,49 @@ void loop() {
       usb_ifc_read_message();
     }
 
-    int32_t panMotion = updateEncoder(&panWheel);
-    
-    if (panMotion != 0) {
-      eos_encoder_nudge_send(0, (panMotion > 0));
-    }
-}
+    enc1val += updateEncoder(&enc1);
+    enc2val += updateEncoder(&enc2);
+    enc3val += updateEncoder(&enc3);
+    enc4val += updateEncoder(&enc4);
 
-static int encoder_locations[4] = {8,7,6,5};
+    int threshold = 10;
+    
+    if (abs(enc1val) > threshold) {
+      eos_encoder_nudge_send(0, (enc1val > 0));
+      enc1val = 0;
+    }
+ 
+   if (abs(enc2val) > threshold) {
+      eos_encoder_nudge_send(1, (enc2val > 0));
+      enc2val = 0;
+    }
+ 
+   if (abs(enc3val) > threshold) {
+      eos_encoder_nudge_send(2, (enc3val > 0));
+      enc3val = 0;
+    }
+ 
+   if (abs(enc4val) > threshold) {
+      eos_encoder_nudge_send(3, (enc4val > 0));
+      enc4val = 0;
+    }
+ 
+ }
+
+static int encoder_locations[5] = {8,7,6,5,5}; 
 
 void eos_encoder_nudge_send(int encoder_num, bool up) {
     usb_ifc_data[0] = 0x03;
-    usb_ifc_data[2] = 0x01;
-    usb_ifc_data[4] = 0x04;
+
+
+    if (encoder_num == 4) {
+      // different header
+      usb_ifc_data[2] = 0x00;
+      usb_ifc_data[4] = 0x01;
+    } else {
+      usb_ifc_data[2] = 0x01;
+      usb_ifc_data[4] = 0x04;
+    }
     
     for (int i=0; i<4; i++) {
       usb_ifc_data[encoder_locations[i]] = 0x00;
