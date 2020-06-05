@@ -1,6 +1,5 @@
 // Encoders Follows EOS
 // by amyworrall
-// Requires the cores library for teensy: https://github.com/amyworrall/cores
 
 #include "usb_dev.h"
 #include "usb_desc.h"
@@ -21,47 +20,22 @@ struct Encoder enc1;
 struct Encoder enc2;
 struct Encoder enc3;
 struct Encoder enc4;
-struct Encoder intensity;
 
 long enc1val = 0;
 long enc2val = 0;
 long enc3val = 0;
 long enc4val = 0;
 
-
 static uint8_t transmit_previous_timeout=0;
 
 // When the PC isn't listening, how long do we wait before discarding data?
 #define TX_TIMEOUT_MSEC 30
-
-#if F_CPU == 240000000
-  #define TX_TIMEOUT (TX_TIMEOUT_MSEC * 1600)
-#elif F_CPU == 216000000
-  #define TX_TIMEOUT (TX_TIMEOUT_MSEC * 1440)
-#elif F_CPU == 192000000
-  #define TX_TIMEOUT (TX_TIMEOUT_MSEC * 1280)
-#elif F_CPU == 180000000
-  #define TX_TIMEOUT (TX_TIMEOUT_MSEC * 1200)
-#elif F_CPU == 168000000
-  #define TX_TIMEOUT (TX_TIMEOUT_MSEC * 1100)
-#elif F_CPU == 144000000
-  #define TX_TIMEOUT (TX_TIMEOUT_MSEC * 932)
-#elif F_CPU == 120000000
-  #define TX_TIMEOUT (TX_TIMEOUT_MSEC * 764)
-#elif F_CPU == 96000000
-  #define TX_TIMEOUT (TX_TIMEOUT_MSEC * 596)
-#elif F_CPU == 72000000
-  #define TX_TIMEOUT (TX_TIMEOUT_MSEC * 512)
-#elif F_CPU == 48000000
-  #define TX_TIMEOUT (TX_TIMEOUT_MSEC * 428)
-#elif F_CPU == 24000000
-  #define TX_TIMEOUT (TX_TIMEOUT_MSEC * 262)
-#endif
+#define TX_TIMEOUT (TX_TIMEOUT_MSEC * 1200)
 
 uint8_t usb_ifc_data[IFC_TX_SIZE];
 
-
 static usb_packet_t *rx_packet=NULL;
+
 
 void initEncoder(struct Encoder* encoder, uint8_t pinA, uint8_t pinB, uint8_t direction) {
   encoder->pinA = pinA;
@@ -97,61 +71,53 @@ int8_t updateEncoder(struct Encoder* encoder) {
   return encoderMotion;
 }
 
+
 void setup() {
-  initEncoder(&enc1, 3, 2, 0);
-  initEncoder(&enc2, 5, 4, 0);
-  initEncoder(&enc3, 7, 6, 0);
-  initEncoder(&enc4, 9, 8, 0);
+  initEncoder(&enc1, 0, 1, 0);
+  initEncoder(&enc2, 2, 3, 0);
+  initEncoder(&enc3, 4, 5, 0);
+  initEncoder(&enc4, 6, 7, 0);
 }
 
 void loop() {
-    while(usb_ifc_available()) {
-      usb_ifc_read_message();
-    }
+  while(usb_ifc_available()) {
+    usb_ifc_read_message();
+  }
 
-    enc1val += updateEncoder(&enc1);
-    enc2val += updateEncoder(&enc2);
-    enc3val += updateEncoder(&enc3);
-    enc4val += updateEncoder(&enc4);
+  enc1val += updateEncoder(&enc1);
+  enc2val += updateEncoder(&enc2);
+  enc3val += updateEncoder(&enc3);
+  enc4val += updateEncoder(&enc4);
 
-    int threshold = 10;
-    
-    if (abs(enc1val) > threshold) {
-      eos_encoder_nudge_send(0, (enc1val > 0));
-      enc1val = 0;
-    }
- 
-   if (abs(enc2val) > threshold) {
-      eos_encoder_nudge_send(1, (enc2val > 0));
-      enc2val = 0;
-    }
- 
-   if (abs(enc3val) > threshold) {
-      eos_encoder_nudge_send(2, (enc3val > 0));
-      enc3val = 0;
-    }
- 
-   if (abs(enc4val) > threshold) {
-      eos_encoder_nudge_send(3, (enc4val > 0));
-      enc4val = 0;
-    }
- 
- }
+  int threshold = 10;
 
-static int encoder_locations[5] = {8,7,6,5,5}; 
+  if (abs(enc1val) > threshold) {
+    eos_encoder_nudge_send(0, (enc1val > 0));
+    enc1val = 0;
+  }
 
+ if (abs(enc2val) > threshold) {
+    eos_encoder_nudge_send(1, (enc2val > 0));
+    enc2val = 0;
+  }
+
+ if (abs(enc3val) > threshold) {
+    eos_encoder_nudge_send(2, (enc3val > 0));
+    enc3val = 0;
+  }
+
+ if (abs(enc4val) > threshold) {
+    eos_encoder_nudge_send(3, (enc4val > 0));
+    enc4val = 0;
+  }
+}
+
+static int encoder_locations[4] = {8,7,6,5}; 
 void eos_encoder_nudge_send(int encoder_num, bool up) {
     usb_ifc_data[0] = 0x03;
 
-
-    if (encoder_num == 4) {
-      // different header
-      usb_ifc_data[2] = 0x00;
-      usb_ifc_data[4] = 0x01;
-    } else {
-      usb_ifc_data[2] = 0x01;
-      usb_ifc_data[4] = 0x04;
-    }
+    usb_ifc_data[2] = 0x01;
+    usb_ifc_data[4] = 0x04;
     
     for (int i=0; i<4; i++) {
       usb_ifc_data[encoder_locations[i]] = 0x00;
