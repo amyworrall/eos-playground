@@ -1,0 +1,28 @@
+* Upper Case & Lower Case & Keyboard Cover Plate
+  * Located in https://github.com/amyworrall/eos-playground/tree/master/Enclosure%20CAD
+* Keyboard PCB
+  * ?
+* Cherry Black Switches (13 orders of 10 keys)
+  * https://www.aliexpress.com/item/32835220421.html?spm=a2g0o.cart.0.0.5a283c00RkUekd&mp=1
+* KeyCaps (2 orders)
+  * http://www.maxkeyboard.com/ansi-layout-custom-backlight-cherry-mx-keycap-set-top-print.html
+  * Screen printing file located in https://github.com/amyworrall/eos-playground/tree/master/Enclosure%20CAD/key%20caps
+* Encoders & Encoder Plate
+  * ?
+* Encoder Face Wheel
+  * ?
+* Silicone Wheel
+  * https://www.amazon.com/CNBTR-Aluminum-Silicone-Industrial-Measuring/dp/B073P24YCP
+  * https://www.amazon.com/CNBTR-Aluminum-Industrial-Encoder-200mmx6mm/dp/B073P21D6W
+* Silicone Wheel bracket
+  * ?
+* Teensy (3 needed)
+  * https://www.pjrc.com/teensy/
+* Faders
+  * Behringer Motor Fader MF100T
+* OLED Displays
+  * Generic 5.5 inch 256*64 SPI OLED Screen with Driver
+* OLED Displays Bracket
+  * ?
+* Power Supply
+  * Mean Well (unsure about model)
